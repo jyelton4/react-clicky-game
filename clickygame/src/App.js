@@ -1,8 +1,4 @@
 import React, { Component } from 'react';
-// eslint-disable-next-line
-import logo from './logo.svg';
-// eslint-disable-next-line
-import $ from 'jquery';
 import './App.css';
 import TopBar from "./components/TopBar";
 import Banner from "./components/Banner";
@@ -23,7 +19,10 @@ const styles = {
 class App extends Component {
 
   state = {
-    results: []
+    results: [],
+    guessed: [],
+    score: 0,
+    topScore: 0
   };
 
   componentDidMount() {
@@ -36,14 +35,46 @@ class App extends Component {
         .catch(err => console.log(err));
   };
 
+  handleScore = (childState) => {
+    let guessed = this.state.guessed;
+    let newScore = this.state.score + 1;
+    if (guessed.indexOf(childState) === -1) {
+      this.setState({ score: newScore });
+      this.setState(prevState => ({
+        guessed: [...prevState.guessed, childState]
+      }))
+    } else {
+      this.setState({ topScore: this.state.score, score: 0 });
+      this.forceUpdate();
+    }
+  };
+
+  shuffleArray = event => {
+    var array = this.state.results;
+    var currentIndex = array.length, temporaryValue, randomIndex;
+
+    while (0 !== currentIndex) {
+
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex -= 1;
+
+      temporaryValue = array[currentIndex];
+      array[currentIndex] = array[randomIndex];
+      array[randomIndex] = temporaryValue;
+    }
+
+    this.setState({ results: array });
+  }
+  
   render() {
-    return <div class="container">
-      <TopBar />
+    return <div className="container">
+      <TopBar score={this.state.score} topScore={this.state.topScore} />
       <Banner />
-      <main class="container" style={styles.main}>
+      <main className="container" style={styles.main}>
         {this.state.results.map( photoLink => 
           <Photo key={this.state.results.indexOf(photoLink)} 
-          url={photoLink} 
+          url={photoLink} shuffleArray={this.shuffleArray}
+          handleScore={this.handleScore}
           />)}
       </main>
       <BottomBar />
