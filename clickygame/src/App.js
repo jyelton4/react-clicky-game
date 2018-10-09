@@ -43,8 +43,11 @@ class App extends Component {
       this.setState(prevState => ({
         guessed: [...prevState.guessed, childState]
       }))
-    } else {
+    } else if (this.state.score > this.state.topScore) {
       this.setState({ topScore: this.state.score, score: 0 });
+      this.forceUpdate();
+    } else {
+      this.setState({ guessed: [], score: 0 });
       this.forceUpdate();
     }
   };
